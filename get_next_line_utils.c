@@ -6,24 +6,25 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 11:48:11 by cpapot            #+#    #+#             */
-/*   Updated: 2022/11/17 18:42:04 by cpapot           ###   ########.fr       */
+/*   Updated: 2022/11/18 18:02:59 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int	line_finish(char *buf)
+
+int	line_finish(char *buf, int last_len)
 {
 	int	i;
 
 	i = 0;
 	while (buf[i] != '\0')
 	{
-		if (buf[i] == '\n')
+		if (buf[i] == '\n' && i > last_len)
 			return (i);
 		i++;
 	}
-	return (i);
+	return (0);
 }
 
 size_t	ft_strlen(const char *str)

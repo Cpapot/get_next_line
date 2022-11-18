@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 11:48:19 by cpapot            #+#    #+#             */
-/*   Updated: 2022/11/17 19:07:24 by cpapot           ###   ########.fr       */
+/*   Updated: 2022/11/18 17:51:05 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,12 @@
 
 # ifndef BUF_SIZE
 
-#  define BUF_SIZE 56
+#  define BUF_SIZE 100
 
 # endif
 
 char	*get_next_line(int fd);
-int		line_finish(char *buf);
+int		line_finish(char *buf, int last_len);
 size_t	ft_strlen(const char *str);
 char	*ft_strjoin(char const *s1, char const *s2);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
