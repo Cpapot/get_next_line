@@ -6,108 +6,168 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 11:48:15 by cpapot            #+#    #+#             */
-/*   Updated: 2022/11/18 18:24:08 by cpapot           ###   ########.fr       */
+/*   Updated: 2022/11/19 17:45:16 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*ft_getl(char *str)
+size_t	ft_strlen(const char *str)
+{
+	size_t	i;
+
+	i = 0;
+	while (str[i] != '\0')
+		i++;
+	return (i);
+}
+
+void	ft_bzero(void *s, size_t n)
+{
+	int	i;
+
+	i = 0;
+	while (i != (int)n)
+	{
+		((unsigned char *)s)[i] = 0;
+		i++;
+	}
+}
+
+char	*ft_strjoin(char *s1, char const *s2)
+{
+	char	*strs;
+	int		i;
+	int		u;
+
+	i = 0;
+	u = 0;
+	strs = malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2) + 1));
+	if (strs == 0)
+		return (0);
+	while (s1[i] != '\0')
+	{
+		strs[i] = s1[i];
+		i++;
+	}
+	while (s2[u] != '\0')
+	{
+		strs[i + u] = s2[u];
+		u++;
+	}
+	strs[i + u] = '\0';
+	if (s1[0] != '\0')
+		free (s1);
+	return (strs);
+}
+
+int	ft_line_end(char *line)
+{
+	int	i;
+
+	i = 0;
+	while (line[i] != '\0')
+	{
+		if (line[i] == '\n')
+			return (i);
+		i++;
+	}
+	return (-1);
+}
+
+char	*ft_read_line(char *buf, int fd)
+{
+	int		i;
+	int		line_len;
+	int		buf_len;
+	char	*line;
+
+	i = 0;
+	buf_len = 1;
+	line_len = -1;
+	line = "";
+	if (buf)
+		line = ft_strjoin(line, buf);
+	while (ft_line_end(line) == -1 && buf_len > 0)
+	{
+		ft_bzero(buf, BUF_SIZE + 1);
+		buf_len = read(fd, buf, BUF_SIZE);
+		if (buf_len == -1)
+			return (free(line), NULL);
+		buf[buf_len] = '\0';
+		line = ft_strjoin(line, buf);
+	}
+	return (line);
+}
+
+char	*ft_malloc_line(char *line)
 {
 	int		i;
 	int		u;
 	char	*result;
 
 	i = 0;
-	u = 0;
-	if (str == NULL)
-		return (NULL);
-	if (str[0] == '\n')
-		str = &str[1];
-	while (str[i] != '\0' && str[i] != '\n')
+	u = ft_strlen(line);
+	while (line[i] != '\n' && i != u)
 		i++;
 	result = malloc(sizeof(char) * (i + 1));
 	if (result == NULL)
 		return (NULL);
-	while (i != 0)
+	u = 0;
+	while (i >= u)
 	{
-		result[u] = str[u];
+		result[u] = line[u];
 		u++;
-		i--;
 	}
 	result[u] = '\0';
+	free (line);
 	return (result);
 }
 
-char	*ft_readfile(char *buf, int fd, int last_len)
+void	ft_setup_next_line(char *buf, char* line)
 {
-	unsigned int	len;
-	char			*result;
-	char			*test;
-
-	len = 1;
-	len = read(fd, buf, BUF_SIZE);
-	buf[len] = '\0';
-	if (len <= 0)
-		return (NULL);
-	if (line_finish(buf, last_len) != 0)
-		return (buf);
-	result = "";
-	result = ft_strjoin(result, buf);
-	while (line_finish(result, last_len) == 0 && len > 0)
-	{
-		len = read(fd, buf, BUF_SIZE);
-		buf[len] = '\0';
-		if (len <= 0)
-			return (NULL);
-		result = ft_strjoin(result, buf);
-	}
-	test = result;
-	free (result);
-	return (test);
-}
-
-char	*ft_getcontent(char *buf, int fd, int last_len)
-{
-	char	*result;
 	int		i;
-	int		line_len;
+	int		u;
 
 	i = 0;
-	result = ft_readfile(buf, fd, last_len);
-	if (result == NULL)
-		return (NULL);
-	line_len = line_finish(result, last_len);
-	result = ft_substr(result, last_len, line_len - last_len);
-	return (ft_getl(result));
+	u = 0;
+	while (buf[i] && buf[i] != '\n')
+		i++;
+	i++;
+	while (line[i + u] != '\0')
+	{
+		buf[u] = line [i + u];
+		u++;
+	}
+	buf[u] = '\0';
 }
 
 char	*get_next_line(int fd)
 {
-	char		buf[BUF_SIZE + 1];
+	static char	buf[BUF_SIZE + 1];
+	char		*line;
 	char		*result;
-	static int	last_line_len = 0;
 
 	if (fd < 0)
 		return (NULL);
-	result = ft_getcontent(buf, fd, last_line_len);
-	if (result == NULL)
+	line = ft_read_line(buf, fd);
+	if (line == NULL)
 		return (NULL);
-	last_line_len = last_line_len + ft_strlen(result) + 1;
-	if (ft_strlen(result) == 0)
-		last_line_len++;
-	return (result);
+	result = ft_malloc_line(line);
+	if (result == NULL)
+		return (free(line), NULL);
+	ft_setup_next_line(buf, line);
+	return(result);
 }
-
 
 #include <stdio.h>
 int	main(void)
 {
 	int i;
 	i = 0;
-	while (i != 25)
+	while (i != 50)
 	{
-		printf("%s\n",get_next_line(open("42.txt", O_RDONLY)));
+		printf("%s",get_next_line(open("42.txt", O_RDONLY)));
 		printf("%s\n", "============================");
 		i++;
 	}
