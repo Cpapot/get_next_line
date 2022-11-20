@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 11:48:19 by cpapot            #+#    #+#             */
-/*   Updated: 2022/11/19 15:17:06 by cpapot           ###   ########.fr       */
+/*   Updated: 2022/11/20 19:04:54 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,17 +20,18 @@
 # include <sys/stat.h>
 # include <fcntl.h>
 # include <unistd.h>
+//# include "ld.h"
 
 # ifndef BUF_SIZE
 
-#  define BUF_SIZE 100
+#  define BUF_SIZE 42
 
 # endif
 
-char	*get_next_line(int fd);
-int		line_finish(char *buf, int last_len);
 size_t	ft_strlen(const char *str);
+void	ft_bzero(void *s, size_t n);
 char	*ft_strjoin(char *s1, char const *s2);
-char	*ft_substr(char const *s, unsigned int start, size_t len);
+int		ft_line_end(char *line);
+char	*get_next_line(int fd);
 
 #endif
