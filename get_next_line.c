@@ -6,13 +6,13 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 11:48:15 by cpapot            #+#    #+#             */
-/*   Updated: 2022/11/21 15:47:06 by cpapot           ###   ########.fr       */
+/*   Updated: 2022/11/21 18:06:06 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*ft_read(char *buf, int fd)
+static char	*ft_read(char *buf, int fd)
 {
 	int		buf_len;
 	char	*line;
@@ -38,7 +38,7 @@ char	*ft_read(char *buf, int fd)
 	return (line);
 }
 
-int	ft_malloc_size(char *line)
+static int	ft_malloc_size(char *line)
 {
 	int	i;
 
@@ -50,7 +50,7 @@ int	ft_malloc_size(char *line)
 	return (i + 1);
 }
 
-char	*ft_malloc_line(char *line)
+static char	*ft_malloc_line(char *line)
 {
 	int		i;
 	int		u;
@@ -75,7 +75,7 @@ char	*ft_malloc_line(char *line)
 	return (result);
 }
 
-void	ft_setup_next_line(char *buf, char *line)
+static void	ft_setup_next_line(char *buf, char *line)
 {
 	int		i;
 	int		u;
@@ -102,7 +102,7 @@ char	*get_next_line(int fd)
 	char		*line;
 	char		*result;
 
-	if (fd < 0 || read(fd, NULL, 0) != 0)
+	if (fd < 0)
 		return (NULL);
 	line = ft_read(buf, fd);
 	if (line == NULL)
@@ -116,29 +116,3 @@ char	*get_next_line(int fd)
 	free(line);
 	return (result);
 }
-
-/*
-#include <stdio.h>
-
-int	main(void)
-{
-	int i;
-	int fd;
-	char *line;
-
-	fd = open("test/read_error.txt", O_RDONLY);
-	i = 0;
-	while (i < 10)
-	{
-		line = get_next_line(fd);
-		printf("%s", line);
-		if (line == NULL)
-			printf("\n");
-		free(line);
-		printf("%s\n", "============================");
-		i++;
-	}
-	//show_leaks();
-}
-
-*/
