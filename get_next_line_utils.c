@@ -6,7 +6,7 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 11:48:11 by cpapot            #+#    #+#             */
-/*   Updated: 2022/11/20 17:06:17 by cpapot           ###   ########.fr       */
+/*   Updated: 2022/11/21 15:49:13 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,6 @@ char	*ft_strjoin(char *s1, char const *s2)
 		u++;
 	}
 	strs[i + u] = '\0';
-	free(s1);
 	return (strs);
 }
 
@@ -72,4 +71,27 @@ int	ft_line_end(char *line)
 		i++;
 	}
 	return (-1);
+}
+
+char	*ft_read_line(int buf_len, char *line, char *buf, int fd)
+{
+	char	*tmp;
+
+	while (ft_line_end(line) == -1 && buf_len > 0)
+	{
+		ft_bzero(buf, BUFFER_SIZE + 1);
+		buf_len = read(fd, buf, BUFFER_SIZE);
+		if (buf_len == -1)
+		{
+			ft_bzero(buf, BUFFER_SIZE + 1);
+			return (free(line), NULL);
+		}
+		buf[buf_len] = '\0';
+		tmp = line;
+		line = ft_strjoin(tmp, buf);
+		free (tmp);
+		if (!line)
+			return (NULL);
+	}
+	return (line);
 }

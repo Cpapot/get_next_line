@@ -6,35 +6,35 @@
 /*   By: cpapot <cpapot@student.42lyon.fr >         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/15 11:48:15 by cpapot            #+#    #+#             */
-/*   Updated: 2022/11/20 19:10:14 by cpapot           ###   ########.fr       */
+/*   Updated: 2022/11/21 15:47:06 by cpapot           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-char	*ft_read_line(char *buf, int fd)
+char	*ft_read(char *buf, int fd)
 {
-	int		i;
-	int		line_len;
 	int		buf_len;
 	char	*line;
+	char	*tmp;
 
-	i = 0;
 	buf_len = 1;
-	line_len = -1;
-	line = malloc(sizeof(*line) * 1);
-	line[0] = '\0';
+	line = NULL;
+	tmp = malloc(sizeof(char));
+	if (!tmp)
+		return (NULL);
+	tmp[0] = '\0';
 	if (buf)
-		line = ft_strjoin(line, buf);
-	while (ft_line_end(line) == -1 && buf_len > 0)
 	{
-		ft_bzero(buf, BUF_SIZE + 1);
-		buf_len = read(fd, buf, BUF_SIZE);
-		if (buf_len == -1)
-			return (free(line), NULL);
-		buf[buf_len] = '\0';
-		line = ft_strjoin(line, buf);
+		line = ft_strjoin(tmp, buf);
+		free (tmp);
+		if (!line)
+			return (NULL);
 	}
+	tmp = ft_read_line(buf_len, line, buf, fd);
+	line = tmp;
+	if (!tmp)
+		return (NULL);
 	return (line);
 }
 
@@ -72,7 +72,6 @@ char	*ft_malloc_line(char *line)
 		u++;
 	}
 	result[u] = '\0';
-	free (line);
 	return (result);
 }
 
@@ -83,6 +82,8 @@ void	ft_setup_next_line(char *buf, char *line)
 
 	i = 0;
 	u = 0;
+	if (!line)
+		return ;
 	while (line[i] && line[i] != '\n')
 		i++;
 	if (line[i] != '\0')
@@ -97,20 +98,47 @@ void	ft_setup_next_line(char *buf, char *line)
 
 char	*get_next_line(int fd)
 {
-	static char	buf[BUF_SIZE + 1];
+	static char	buf[BUFFER_SIZE + 1];
 	char		*line;
 	char		*result;
 
-	if (fd < 0)
+	if (fd < 0 || read(fd, NULL, 0) != 0)
 		return (NULL);
-	line = ft_read_line(buf, fd);
+	line = ft_read(buf, fd);
 	if (line == NULL)
 		return (NULL);
 	result = ft_malloc_line(line);
 	if (result == NULL)
-		return (NULL);
+		return (free(line), NULL);
 	if (result[0] == '\0')
-		return (free(result), NULL);
+		return (free(line), free(result), NULL);
 	ft_setup_next_line(buf, line);
+	free(line);
 	return (result);
 }
+
+/*
+#include <stdio.h>
+
+int	main(void)
+{
+	int i;
+	int fd;
+	char *line;
+
+	fd = open("test/read_error.txt", O_RDONLY);
+	i = 0;
+	while (i < 10)
+	{
+		line = get_next_line(fd);
+		printf("%s", line);
+		if (line == NULL)
+			printf("\n");
+		free(line);
+		printf("%s\n", "============================");
+		i++;
+	}
+	//show_leaks();
+}
+
+*/
